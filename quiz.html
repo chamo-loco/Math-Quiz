@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Placement Exam Practice Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .katex-display {
+            display: block;
+            margin: 0;
+            text-align: center;
+        }
+        .option-btn {
+            transition: background-color 0.3s, border-color 0.3s, transform 0.1s;
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+        }
+        .correct {
+            background-color: #22c55e !important; /* green-500 */
+            border-color: #16a34a !important; /* green-600 */
+            color: white !important;
+        }
+        .incorrect {
+            background-color: #ef4444 !important; /* red-500 */
+            border-color: #dc2626 !important; /* red-600 */
+            color: white !important;
+        }
+    </style>
+    <!-- KaTeX for rendering math -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 flex items-center justify-center min-h-screen p-4">
+    <div id="quiz-container" class="w-full max-w-2xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
+        <div id="quiz-header" class="text-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-indigo-600 dark:text-indigo-400">Math Practice Quiz</h1>
+            <p class="text-gray-600 dark:text-gray-400 mt-2">Test your skills with questions from the MPE practice sheet.</p>
+        </div>
+        
+        <div id="question-area" class="hidden">
+            <div class="flex justify-between items-center mb-4">
+                <div id="progress" class="text-sm font-medium text-gray-500 dark:text-gray-400"></div>
+                <div id="score" class="text-sm font-bold text-indigo-600 dark:text-indigo-400">Score: 0</div>
+            </div>
+            <div id="question-card" class="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg mb-6">
+                <p class="text-lg font-semibold mb-2">Question <span id="question-number"></span>:</p>
+                <div id="question-text" class="text-xl md:text-2xl text-center"></div>
+            </div>
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Options will be inserted here -->
+            </div>
+            <div class="mt-8 text-center">
+                <button id="next-btn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 w-full md:w-auto hidden">Next Question</button>
+            </div>
+        </div>
+
+        <div id="start-screen" class="text-center">
+             <h2 class="text-xl font-semibold mb-4">Ready to Start?</h2>
+             <button id="start-btn" class="bg-indigo-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-indigo-700 transition-colors duration-300 transform hover:scale-105">Start Quiz</button>
+        </div>
+
+        <div id="result-screen" class="hidden text-center">
+            <h2 class="text-3xl font-bold mb-4">Quiz Complete!</h2>
+            <p class="text-xl mb-2">Your Final Score:</p>
+            <p id="final-score" class="text-5xl font-extrabold text-indigo-600 dark:text-indigo-400 mb-6"></p>
+            <p id="result-message" class="text-lg mb-8"></p>
+            <button id="restart-btn" class="bg-indigo-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-indigo-700 transition-colors duration-300">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Rationalize the denominator: $$\\frac{14}{3+\\sqrt{2}}$$",
+                options: ["$6 - 2\\sqrt{2}$", "$42 - 14\\sqrt{2}$", "$2(3-\\sqrt{2})$", "$6 + 2\\sqrt{2}$"],
+                answer: "$6 - 2\\sqrt{2}$"
+            },
+            {
+                question: "Solve for x: $$5(x-7)-13(x-7)-6=0$$",
+                options: ["$x = \\frac{25}{4}$", "$x = -\\frac{31}{8}$", "$x = \\frac{23}{4}$", "$x = 7$"],
+                answer: "$x = \\frac{25}{4}$"
+            },
+            {
+                question: "Given $-2x+4y=12$ and $3x-5y=-3$, find the value of $x+y$.",
+                options: ["39", "9", "24", "15"],
+                answer: "39"
+            },
+            {
+                question: "Find the domain of $f(x) = \\frac{\\sqrt{x^2-3x-4}}{6x^2-54}$",
+                options: ["$(-\\infty, -3) \\cup (-3, -1] \\cup [4, 3) \\cup (3, \\infty)$", "$(-\\infty, -1] \\cup [4, \\infty)$", "$x \\neq \\pm 3$", "All real numbers"],
+                answer: "$(-\\infty, -3) \\cup (-3, -1] \\cup [4, 3) \\cup (3, \\infty)$"
+            },
+            {
+                question: "Solve for x: $$log(x+2)+log(x-1)=1$$",
+                options: ["$x=3$", "$x=-4, x=3$", "$x=-4$", "No solution"],
+                answer: "$x=3$"
+            },
+            {
+                question: "Solve the equation $e^{2x} - 2e^x - 3 = 0$ for x.",
+                options: ["$ln(3)$", "$ln(3), ln(-1)$", "$0$", "$e^3$"],
+                answer: "$ln(3)$"
+            },
+            {
+                question: "If $\\theta$ is in Quadrant II and $sin(\\theta) = \\frac{1}{7}$, what is $cos(\\theta)$?",
+                options: ["$-\\frac{4\\sqrt{3}}{7}$", "$\\frac{4\\sqrt{3}}{7}$", "$\\frac{1}{7}$", "$-\\frac{6}{7}$"],
+                answer: "$-\\frac{4\\sqrt{3}}{7}$"
+            },
+            {
+                question: "Evaluate $log_4(\\frac{1}{\\sqrt[3]{16}})$",
+                options: ["$-\\frac{2}{3}$", "$\\frac{2}{3}$", "$-2$", "$\\frac{3}{2}$"],
+                answer: "$-\\frac{2}{3}$"
+            },
+            {
+                question: "Simplify the expression: $$\\frac{\\cos^2(\\theta)}{1+\\sin(\\theta)}$$",
+                options: ["$1 - \\sin(\\theta)$", "$1 + \\sin(\\theta)$", "$\\cos(\\theta)$", "$\\sec(\\theta)$"],
+                answer: "$1 - \\sin(\\theta)$"
+            }
+        ];
+
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const nextBtn = document.getElementById('next-btn');
+        
+        const startScreen = document.getElementById('start-screen');
+        const quizArea = document.getElementById('question-area');
+        const resultScreen = document.getElementById('result-screen');
+        
+        const questionText = document.getElementById('question-text');
+        const questionNumberEl = document.getElementById('question-number');
+        const optionsContainer = document.getElementById('options-container');
+        const progressEl = document.getElementById('progress');
+        const scoreEl = document.getElementById('score');
+        const finalScoreEl = document.getElementById('final-score');
+        const resultMessageEl = document.getElementById('result-message');
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let shuffledQuestions = [];
+
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizArea.classList.remove('hidden');
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            shuffledQuestions = quizData.sort(() => Math.random() - 0.5);
+            
+            scoreEl.textContent = `Score: ${score}`;
+            nextBtn.classList.add('hidden');
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            resetState();
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            
+            questionNumberEl.textContent = currentQuestionIndex + 1;
+            progressEl.textContent = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
+            
+            renderMath(questionText, currentQuestion.question);
+
+            currentQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.classList.add('option-btn', 'w-full', 'p-4', 'border-2', 'rounded-lg', 'text-left', 'bg-gray-100', 'dark:bg-gray-600', 'border-gray-300', 'dark:border-gray-500', 'hover:bg-indigo-100', 'dark:hover:bg-indigo-500', 'hover:border-indigo-400');
+                renderMath(button, option);
+                button.dataset.answer = option;
+                button.addEventListener('click', selectAnswer);
+                optionsContainer.appendChild(button);
+            });
+        }
+        
+        function renderMath(element, text) {
+            katex.render(text, element, {
+                throwOnError: false,
+                displayMode: text.includes('$$')
+            });
+        }
+
+        function resetState() {
+            nextBtn.classList.add('hidden');
+            while (optionsContainer.firstChild) {
+                optionsContainer.removeChild(optionsContainer.firstChild);
+            }
+        }
+
+        function selectAnswer(e) {
+            const selectedBtn = e.currentTarget;
+            const correct = selectedBtn.dataset.answer === shuffledQuestions[currentQuestionIndex].answer;
+
+            if (correct) {
+                score++;
+                scoreEl.textContent = `Score: ${score}`;
+                selectedBtn.classList.add('correct');
+            } else {
+                selectedBtn.classList.add('incorrect');
+            }
+
+            Array.from(optionsContainer.children).forEach(button => {
+                if (button.dataset.answer === shuffledQuestions[currentQuestionIndex].answer) {
+                    button.classList.add('correct');
+                }
+                button.disabled = true;
+            });
+
+            if (shuffledQuestions.length > currentQuestionIndex + 1) {
+                nextBtn.classList.remove('hidden');
+            } else {
+                setTimeout(showResults, 1000);
+            }
+        }
+        
+        function showNextQuestion() {
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        function showResults() {
+            quizArea.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+
+            const percentage = Math.round((score / shuffledQuestions.length) * 100);
+            finalScoreEl.textContent = `${percentage}%`;
+
+            let message = '';
+            if (percentage === 100) {
+                message = "Perfect score! You're a math wizard!";
+            } else if (percentage >= 75) {
+                message = "Great job! You've got a strong grasp of this material.";
+            } else if (percentage >= 50) {
+                message = "Good effort! A little more practice and you'll be set.";
+            } else {
+                message = "Keep practicing! Review the concepts and try again.";
+            }
+            resultMessageEl.textContent = message;
+        }
+
+        startBtn.addEventListener('click', startQuiz);
+        restartBtn.addEventListener('click', startQuiz);
+        nextBtn.addEventListener('click', showNextQuestion);
+    </script>
+</body>
+</html>
